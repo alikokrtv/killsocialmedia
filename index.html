@@ -1,54 +1,121 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PROJECT OCULI — Frekansı Kır, İnsanı Bul</title>
   <meta name="description" content="Project Oculi — Parazit içinde kaybolan insanlığı bulmak için radikal bir sosyal deney." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700;800&family=Caveat:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- ══════════════════════════════════
-       BREACH SEQUENCE (Terminal Intro)
-  ══════════════════════════════════ -->
-  <div id="breach-overlay">
-    <div id="breach-terminal">
-      <div id="breach-header">
-        <span class="breach-tag">[ PROJECT OCULI // SYSTEM SCAN ]</span>
-        <span class="breach-tag" id="breach-clock"></span>
+  <!-- ══════════════════════════════════════════════════════
+       PHASE 3: AWAKENING SEQUENCE OVERLAY
+       Replaces the old Terminal Breach
+  ══════════════════════════════════════════════════════ -->
+  <div id="awakening-overlay">
+
+    <!-- PHASE A: Digital Trance (0–30s) -->
+    <div id="aw-trance" class="aw-phase">
+
+      <!-- Blue heartbeat light (phone/screen glow from below) -->
+      <div id="aw-blue-light"></div>
+
+      <!-- Cinematic CSS Scenes (rotate every 8s) -->
+      <div id="aw-scenes">
+
+        <div class="aw-scene aw-scene--active" id="scene-metro">
+          <div class="scene-silhouette scene-metro-sil"></div>
+          <div class="scene-phone-glow"></div>
+          <div class="scene-caption">Metroda...</div>
+        </div>
+
+        <div class="aw-scene" id="scene-toilet">
+          <div class="scene-silhouette scene-toilet-sil"></div>
+          <div class="scene-phone-glow"></div>
+          <div class="scene-caption">Tuvalette...</div>
+        </div>
+
+        <div class="aw-scene" id="scene-bed">
+          <div class="scene-silhouette scene-bed-sil"></div>
+          <div class="scene-phone-glow scene-phone-glow--ceiling"></div>
+          <div class="scene-caption">Gece ayakta...</div>
+        </div>
+
+        <div class="aw-scene" id="scene-street">
+          <div class="scene-silhouette scene-street-sil"></div>
+          <div class="scene-phone-glow"></div>
+          <div class="scene-caption">Sokakta...</div>
+        </div>
+
       </div>
-      <div id="breach-lines"></div>
-      <div id="breach-progress-wrap">
-        <div id="breach-progress-bar"></div>
-      </div>
-      <div id="breach-status">INITIALIZING...</div>
+
+      <!-- Whisper words drifting across screen -->
+      <div id="aw-whispers" aria-hidden="true"></div>
+
+      <!-- Fake notification spam -->
+      <div id="aw-notifications" aria-hidden="true"></div>
+
+      <!-- Grain noise layer -->
+      <div class="aw-grain"></div>
+
+      <!-- Bottom UI hint -->
+      <div id="aw-hint">[ sistem sizi i̇zliyor... ]</div>
+
     </div>
+
+    <!-- PHASE B: DUR. (30–36s) -->
+    <div id="aw-dur" class="aw-phase hidden">
+      <div id="aw-dur-text">DUR.</div>
+      <div id="aw-dur-sub">Gerçeğe bak.<br/><span style="font-size:.5em;letter-spacing:4px">Ekranı bırak.</span></div>
+    </div>
+
+    <!-- PHASE C: Awakening Transition (36–52s) -->
+    <div id="aw-light" class="aw-phase hidden">
+      <div id="aw-light-bg"></div>
+      <div id="aw-light-msg">
+        <p class="aw-light-line" id="awl-1">Güneş hâlâ orada.</p>
+        <p class="aw-light-line" id="awl-2">Bir kuş var dışarıda.</p>
+        <p class="aw-light-line" id="awl-3">Yanında biri var.</p>
+        <p class="aw-light-line" id="awl-4">Project Oculi bir köprüdür.</p>
+        <p class="aw-light-cta" id="awl-5">Şimdi — ilerle.</p>
+      </div>
+    </div>
+
   </div>
 
-  <!-- ══════════════════════════════════
-       GLITCH OVERLAY (Gatur Filter)
-  ══════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════════════════
+       GATUR FILTER (active during dark mode only)
+  ══════════════════════════════════════════════════════ -->
   <div id="gatur-overlay" class="gatur-active">
     <div class="gatur-scanlines"></div>
     <div class="gatur-noise"></div>
     <div class="gatur-bar"></div>
   </div>
 
-  <!-- ══════════════════════════════════
-       MAIN CONTAINER
-  ══════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════════════════
+       FLOWER BLOOM LAYER (appears as XP grows)
+  ══════════════════════════════════════════════════════ -->
+  <div id="flower-layer" aria-hidden="true">
+    <div class="flower" id="fl-1" style="left:8%;top:20%"></div>
+    <div class="flower" id="fl-2" style="left:88%;top:35%"></div>
+    <div class="flower" id="fl-3" style="left:15%;top:75%"></div>
+    <div class="flower" id="fl-4" style="left:75%;top:80%"></div>
+    <div class="flower" id="fl-5" style="left:48%;top:12%"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       MAIN CONTENT
+  ══════════════════════════════════════════════════════ -->
   <main id="main-content" class="hidden">
 
     <!-- HEADER -->
     <header id="site-header">
       <div class="header-inner">
         <div class="logo">
-          <span class="logo-bracket">[</span>
-          OCULI
-          <span class="logo-bracket">]</span>
+          <span class="logo-bracket">[</span>OCULI<span class="logo-bracket">]</span>
         </div>
         <nav class="site-nav">
           <a href="#dashboard">DASHBOARD</a>
@@ -73,7 +140,7 @@
     <!-- ══ HERO ══ -->
     <section id="hero">
       <div class="hero-inner">
-        <p class="hero-pre">// deneysel sosyal protokol v0.1</p>
+        <p class="hero-pre">// deneysel sosyal protokol v1.0</p>
         <h1 id="hero-title">
           <span class="glitch-text" data-text="FREKANSINI">FREKANSINI</span><br/>
           <span class="glitch-text" data-text="BUL.">BUL.</span>
@@ -83,8 +150,6 @@
           Sesin geri alabilir.<br/>
           <em>İnsan sesi. 85 Hz. 255 Hz.</em>
         </p>
-
-        <!-- RED PILL CTA -->
         <button id="red-pill-btn" aria-label="Kırmızı hapı yut - kamerayı etkinleştir">
           <span class="pill-inner">
             <span class="pill-icon">●</span>
@@ -92,14 +157,11 @@
           </span>
           <span class="pill-glow"></span>
         </button>
-
         <p class="hero-warning">
           <span class="warn-icon">⚠</span>
           Kameranıza ve mikrofonunuza erişim talep edilecek.
         </p>
       </div>
-
-      <!-- Decorative grid lines -->
       <div class="hero-grid" aria-hidden="true">
         <div class="g-line"></div><div class="g-line"></div>
         <div class="g-line"></div><div class="g-line"></div>
@@ -116,10 +178,10 @@
 
         <div class="dash-card dash-card--rank">
           <div class="dash-card-label">RÜTBE</div>
-          <div id="dash-rank-label" class="dash-rank-value rank-zombie">ZOMBİ</div>
-          <div id="dash-rank-desc" class="dash-rank-desc">Algoritmanın besinisin. Uyku modunda.</div>
+          <div id="dash-rank-label" class="dash-rank-value rank-uyuyan">UYUYAN</div>
+          <div id="dash-rank-desc" class="dash-rank-desc">Henüz uyanmadın. Frekansın bekleniyor.</div>
           <div class="rank-legend">
-            <div class="rl-item"><span class="rl-dot" style="background:var(--red)"></span><span class="rl-range">0–100 XP</span><span class="rl-name r-zombie">ZOMBİ</span></div>
+            <div class="rl-item"><span class="rl-dot" style="background:var(--red)"></span><span class="rl-range">0–100 XP</span><span class="rl-name r-uyuyan">UYUYAN</span></div>
             <div class="rl-item"><span class="rl-dot" style="background:var(--violet)"></span><span class="rl-range">101–500 XP</span><span class="rl-name r-awakening">UYANIŞTA</span></div>
             <div class="rl-item"><span class="rl-dot" style="background:var(--green)"></span><span class="rl-range">501+ XP</span><span class="rl-name r-guide">OCULİ REHBERİ</span></div>
           </div>
@@ -146,6 +208,97 @@
       </div>
     </section>
 
+    <!-- ══ DYNAMIC PERSONALIZED TASKS ══ -->
+    <section id="dynamic-tasks">
+      <div class="section-label">// Kişiselleştirilmiş İnsanlık Görevi</div>
+      <h2 class="section-title">BUGÜNKÜ<br/><span class="accent-green">GÖREVİN</span></h2>
+      <p class="section-desc">
+        Görevler rütbene ve LocalStorage'daki geçmişine göre üretilir.<br/>
+        <span class="ls-note">⚠ Sadece tarayıcında saklanır — sunucuya gönderilmez.</span>
+      </p>
+
+      <!-- Frekans hatırlatma widget'ı -->
+      <div id="freq-reminder">
+        <div class="fr-label">RADYO FREKANSINI HATIRLA</div>
+        <div class="fr-band">
+          <div class="fr-tick" style="left:0%">20Hz</div>
+          <div class="fr-tick" style="left:18%">85Hz</div>
+          <div class="fr-tick" style="left:55%">255Hz</div>
+          <div class="fr-tick" style="left:100%">20kHz</div>
+          <div id="fr-human-zone"></div>
+          <div id="fr-needle"></div>
+        </div>
+        <div class="fr-desc">İnsan sesi: <strong>85 Hz – 255 Hz</strong> — Bu aralıkta konuş, Gatur kırılır.</div>
+      </div>
+
+      <!-- Task cards — rendered by JS -->
+      <div id="dynamic-task-grid"></div>
+
+      <!-- Global humanity news feed (kurgusal) -->
+      <div id="humanity-feed">
+        <div class="hf-label">// Dünyadan — İnsanlığı Etkileyen Başlıklar</div>
+        <div id="hf-items"></div>
+      </div>
+    </section>
+
+    <!-- ══ ANALOG TASK ══ -->
+    <section id="analog-task">
+      <div class="section-label">// Fiziksel Görev Protokolü</div>
+      <h2 class="section-title">ANALOG<br/><span class="accent-green">GÖREV</span></h2>
+      <p class="section-desc">
+        Sistem seni izler ama <strong>dokunuşunu</strong> ölçemez.<br/>
+        Her görevi tamamladığında konuş — frekansın bunu doğrular.
+      </p>
+
+      <div id="analog-task-grid">
+
+        <div class="analog-card" id="task-window">
+          <div class="analog-card-num">01</div>
+          <h3 class="analog-card-title">Pencereyi Aç</h3>
+          <p class="analog-card-desc">
+            Telefonu bırak. Pencereni aç.<br/>
+            Dışarıdan gelen bir sesi fark et.<br/>
+            <em>Sonra bunu yüksek sesle söyle.</em>
+          </p>
+          <div class="analog-card-reward">+25 XP (ses algılandığında)</div>
+        </div>
+
+        <div class="analog-card" id="task-handshake">
+          <div class="analog-card-num">02</div>
+          <h3 class="analog-card-title">Yanındakinin Elini Sık</h3>
+          <p class="analog-card-desc">
+            Sistem dokunuşu algılayamaz ama sen hissedersin.<br/>
+            Elini sıktıktan sonra ona "merhaba" de.<br/>
+            <em>Frekansın kanıt.</em>
+          </p>
+          <div class="analog-card-reward">+50 XP (bağlantı kuruldu)</div>
+        </div>
+
+        <div class="analog-card" id="task-bird">
+          <div class="analog-card-num">03</div>
+          <h3 class="analog-card-title">Bir Kuş Sesini Onayla</h3>
+          <p class="analog-card-desc">
+            Dışarıda bir kuş sesi var mı?<br/>
+            Pencere veya kapı aç ve dinle.<br/>
+            <em>Duyduğunu yüksek sesle söyle.</em>
+          </p>
+          <div class="analog-card-reward">+30 XP (yüksek frekans algılandı)</div>
+        </div>
+
+        <div class="analog-card" id="task-sky">
+          <div class="analog-card-num">04</div>
+          <h3 class="analog-card-title">Gökyüzüne Bak</h3>
+          <p class="analog-card-desc">
+            Bu siteyi kapat.<br/>
+            Dışarı çık, gökyüzüne bak, rüzgarı hisset.<br/>
+            <em>Geri dönmak zorunda değilsin.</em>
+          </p>
+          <div class="analog-card-reward">Nihai Başarı — Sistem seni kaybetti. ✓</div>
+        </div>
+
+      </div>
+    </section>
+
     <!-- ══ AR SENSOR SECTION ══ -->
     <section id="sensor">
       <div class="section-label">// Ses Analiz Motoru</div>
@@ -161,45 +314,26 @@
           <div id="freq-label">— BEKLEMEDE —</div>
         </div>
         <div id="audio-status-grid">
-          <div class="stat-cell">
-            <span class="stat-key">DURUM</span>
-            <span class="stat-val" id="stat-status">PASİF</span>
-          </div>
-          <div class="stat-cell">
-            <span class="stat-key">FREKANS</span>
-            <span class="stat-val" id="stat-freq">— Hz</span>
-          </div>
-          <div class="stat-cell">
-            <span class="stat-key">İNSAN SESİ</span>
-            <span class="stat-val" id="stat-human">HAYIR</span>
-          </div>
-          <div class="stat-cell">
-            <span class="stat-key">GATUR</span>
-            <span class="stat-val" id="stat-gatur">AKTİF</span>
-          </div>
+          <div class="stat-cell"><span class="stat-key">DURUM</span><span class="stat-val" id="stat-status">PASİF</span></div>
+          <div class="stat-cell"><span class="stat-key">FREKANS</span><span class="stat-val" id="stat-freq">— Hz</span></div>
+          <div class="stat-cell"><span class="stat-key">İNSAN SESİ</span><span class="stat-val" id="stat-human">HAYIR</span></div>
+          <div class="stat-cell"><span class="stat-key">GATUR</span><span class="stat-val" id="stat-gatur">AKTİF</span></div>
         </div>
       </div>
-
-      <button id="mic-btn" class="secondary-btn" aria-label="Mikrofonu etkinleştir">
-        MİKROFONU ETKİNLEŞTİR
-      </button>
+      <button id="mic-btn" class="secondary-btn" aria-label="Mikrofonu etkinleştir">MİKROFONU ETKİNLEŞTİR</button>
     </section>
 
-    <!-- ══ AR VIEW SECTION ══ -->
+    <!-- ══ AR VIEW ══ -->
     <section id="ar-view" class="hidden-section">
       <div class="section-label">// AR Protokolü</div>
       <h2 class="section-title">LENS AKTİF</h2>
       <div id="camera-container">
         <video id="camera-feed" autoplay playsinline muted></video>
         <div id="camera-overlay">
-          <div class="cam-corner tl"></div>
-          <div class="cam-corner tr"></div>
-          <div class="cam-corner bl"></div>
-          <div class="cam-corner br"></div>
+          <div class="cam-corner tl"></div><div class="cam-corner tr"></div>
+          <div class="cam-corner bl"></div><div class="cam-corner br"></div>
           <div id="cam-reticle"></div>
-          <div id="cam-info">
-            <span>HEDEF TARANİYOR...</span>
-          </div>
+          <div id="cam-info"><span>HEDEF TARANIYOR...</span></div>
         </div>
       </div>
       <button id="stop-cam-btn" class="secondary-btn danger-btn">LENSI KAPAT</button>
@@ -207,7 +341,7 @@
 
     <!-- ══ MANİFESTO ══ -->
     <section id="manifesto">
-      <div class="section-label">// Manifesto v1.0 — Project Oculi</div>
+      <div class="section-label">// Manifesto v2.0 — Project Oculi</div>
       <h2 class="section-title">FREKANSINI KIR.<br/><span class="accent-red">İNSANI BUL.</span></h2>
 
       <div class="manifesto-body">
@@ -216,13 +350,7 @@
           <span class="manifesto-num">01</span>
           <div class="manifesto-text">
             <h3>Ekran Bir Kafes Değil, Ama Seni Tutmaya Devam Ediyor</h3>
-            <p>
-              Sabahın 3'ünde yatak odanda, bir ekranın mavi ışığında oturuyorsun.
-              Kimse seni zorlamadı. Kimse seni zincirlere vurmadı.
-              Ama işte buradasın. Çünkü sistem <em>bağımlılık için tasarlandı</em>,
-              özgürlük için değil. Algoritma seni tanıyor. Korkularını, arzularını,
-              yalnızlığını biliyor. Ve bunları sana geri satıyor.
-            </p>
+            <p>Sabahın 3'ünde yatak odanda, bir ekranın mavi ışığında oturuyorsun. Kimse seni zorlamadı. Kimse seni zincirlere vurmadı. Ama işte buradasın. Çünkü sistem <em>bağımlılık için tasarlandı</em>, özgürlük için değil.</p>
           </div>
         </div>
 
@@ -230,14 +358,7 @@
           <span class="manifesto-num">02</span>
           <div class="manifesto-text">
             <h3>Gatur: Sistemin Adı</h3>
-            <p>
-              "Gatur" dediğimizde şunu kastediyoruz: Dikkat ekonomisinin,
-              parazitli bir örtü gibi gerçekliğinin üzerine serilen o katmanı.
-              Ekranındaki her bildirim bir <strong>elektriksel dürtü</strong>.
-              Her sonsuz kaydırma, dopamininin tükenmesidir.
-              Görmek istediğin her şeyin arkasında seni gören bir göz var.
-              Biz ona Gatur diyoruz.
-            </p>
+            <p>"Gatur" dediğimizde şunu kastediyoruz: Dikkat ekonomisinin parazitli bir örtü gibi gerçekliğinin üzerine serilen o katmanı. Ekranındaki her bildirim bir <strong>elektriksel dürtü</strong>. Her sonsuz kaydırma, dopamininin tükenmesidir.</p>
           </div>
         </div>
 
@@ -245,14 +366,7 @@
           <span class="manifesto-num">03</span>
           <div class="manifesto-text">
             <h3>85 Hz'den 255 Hz'e: İnsanın Frekansı</h3>
-            <p>
-              İnsan sesi bir aralıkta titreşir. 85 Hz ile 255 Hz arasında,
-              bir konuşmanın tüm insani yükü taşınır — keder, sevinç, öfke, sevgi.
-              Bu frekans aralığı <strong>bir impulstur</strong>. Sistemin anlayamadığı,
-              satamadığı, algoritmaya sığdıramadığı tek şey: gerçek, canlı,
-              dijital omurganın dışına taşan bir insan sesi.
-              Konuş. Frekansın, Gatur'u kıracak.
-            </p>
+            <p>İnsan sesi 85 Hz ile 255 Hz arasında titreşir. Bu frekans <strong>bir impulstur</strong> — sistemin anlayamadığı, satamadığı, algoritmaya sığdıramadığı tek şey. Konuş. Frekansın, Gatur'u kıracak.</p>
           </div>
         </div>
 
@@ -260,14 +374,23 @@
           <span class="manifesto-num">04</span>
           <div class="manifesto-text">
             <h3>Oculi: İzleyen Göz</h3>
-            <p>
-              Project Oculi bir araç değil, bir <strong>ayna</strong>.
-              Seni izleyen sistemi geri izlemek için tasarlandı.
-              Kameran açıldığında, yönü tersine çeviririz.
-              Artık sen bakıyorsun. Artık sen görüyorsun.
-              Sistemin sende bıraktığı hasarı, glitch'in dağıtık dilinde okuyorsun.
-              Bu bir oyun değil. Bu gerçek.
-            </p>
+            <p>Project Oculi bir araç değil, bir <strong>ayna</strong>. Seni izleyen sistemi geri izlemek için tasarlandı. Kameran açıldığında, yönü tersine çeviririz. Artık sen bakıyorsun.</p>
+          </div>
+        </div>
+
+        <div class="manifesto-block">
+          <span class="manifesto-num">05</span>
+          <div class="manifesto-text">
+            <h3>Rütben Senin Gerçekliğindir</h3>
+            <p>Sistem seni "takipçi" sayınla ölçer; biz ise insanlık frekansınla. Eğer rütben <strong>Uyuyan</strong> ise, algoritmanın sadece bir besinisin. Kazandığın her XP, seni algoritmik bir kopyadan <em>gerçek bir insana</em> dönüştürür.</p>
+          </div>
+        </div>
+
+        <div class="manifesto-block">
+          <span class="manifesto-num">06</span>
+          <div class="manifesto-text">
+            <h3>Çiçek Açar mı Kod?</h3>
+            <p>Yapay zeka sana çiçeklerin fotoğrafını sunar, biz ise seni o çiçeği <em>koklamaya</em> gönderiyoruz. Her XP'yle bu ekranda açan dijital çiçekler, seni gerçek dünyanın renklerine hazırlıyor. Asıl çiçek dışarıda.</p>
           </div>
         </div>
 
@@ -281,19 +404,18 @@
         </div>
 
         <div class="manifesto-block">
-          <span class="manifesto-num">05</span>
+          <span class="manifesto-num">07</span>
           <div class="manifesto-text">
-            <h3>Rütben Senin Gerçekliğindir</h3>
-            <p>
-              Sistem seni <em>"takipçi"</em> sayınla ölçer; biz ise insanlık frekansınla.
-              Eğer rütben <strong>Zombi</strong> ise, algoritmanın sadece bir besinisin —
-              sessiz, görünmez ve tüketilebilir. <strong>Rehber</strong> rütbesine ulaştığında
-              ise, paraziti dağıtan bir ışık kaynağına dönüşürsün. Kazandığın her XP,
-              seni algoritmik bir kopyadan <em>gerçek bir insana</em> dönüştürür.
-            </p>
-            <p style="margin-top:16px">
-              Seçim senin: <strong>Veri havuzunda boğulmak mı, yoksa frekansı yönetmek mi?</strong>
-            </p>
+            <h3>Algoritma Seni Duymaz, Dostun Duyar</h3>
+            <p>Bu site bir varış noktası değil, bir <strong>köprüdür</strong>. Köprünün bu tarafı metal ve kod, karşı tarafı ise toprak ve ses. Bizim başarımız, senin bu siteyi kapatıp yanındaki dostuna sarıldığın andır. Seçim senin: <em>Veri mi olacaksın, yoksa frekans mı?</em></p>
+          </div>
+        </div>
+
+        <div class="manifesto-block manifesto-block--light">
+          <span class="manifesto-num" style="color:var(--earth)">08</span>
+          <div class="manifesto-text">
+            <h3>Işığı Gördün, Şimdi Güneşi Hisset</h3>
+            <p>Mavi ışık seni sadece aydınlatmadı, seni <strong>kör etti</strong>. Gece ayakta, sokakta, metroda... Hep oradaydın ama hiç orada değildin. Artık bir ışık var dışarıda. Onu görmek için bu ekranı kapatman yeterli. Rüzgarı hisset. Gökyüzüne bak. Güneş hâlâ orada. <em>Hep oradaydı.</em></p>
           </div>
         </div>
 
@@ -304,7 +426,7 @@
     <footer id="site-footer">
       <div class="footer-inner">
         <span class="footer-tag">[ PROJECT OCULI ]</span>
-        <span class="footer-tag">// v1.0-phase1</span>
+        <span class="footer-tag">// v1.0-phase3</span>
         <span class="footer-tag">// sosyal deney</span>
         <span class="footer-tag" id="footer-gatur-live">// küresel parazit: 87.4%</span>
       </div>
