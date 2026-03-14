@@ -51,13 +51,21 @@
           <span class="logo-bracket">]</span>
         </div>
         <nav class="site-nav">
+          <a href="#dashboard">DASHBOARD</a>
           <a href="#manifesto">MANİFESTO</a>
           <a href="#sensor">SENSÖR</a>
           <a href="#ar-view">LENS</a>
         </nav>
-        <div class="header-signal">
-          <span id="signal-dot"></span>
-          <span id="signal-label">OFFLINE</span>
+        <div class="header-right">
+          <div id="global-gatur-widget" title="Küresel Parazit Seviyesi">
+            <span class="gatur-widget-label">⬛ KÜRESEL PARAZIT</span>
+            <span id="global-gatur-value">87.4%</span>
+            <div class="gatur-widget-bar"><div id="global-gatur-bar-fill"></div></div>
+          </div>
+          <div class="header-signal">
+            <span id="signal-dot"></span>
+            <span id="signal-label">OFFLINE</span>
+          </div>
         </div>
       </div>
     </header>
@@ -96,6 +104,45 @@
         <div class="g-line"></div><div class="g-line"></div>
         <div class="g-line"></div><div class="g-line"></div>
         <div class="g-line"></div>
+      </div>
+    </section>
+
+    <!-- ══ USER STATUS DASHBOARD ══ -->
+    <section id="dashboard">
+      <div class="section-label">// Kullanıcı Durumu — Humanity XP Sistemi</div>
+      <h2 class="section-title">İNSANLIK<br/><span class="accent-violet">PANELİ</span></h2>
+
+      <div id="dash-grid">
+
+        <div class="dash-card dash-card--rank">
+          <div class="dash-card-label">RÜTBE</div>
+          <div id="dash-rank-label" class="dash-rank-value rank-zombie">ZOMBİ</div>
+          <div id="dash-rank-desc" class="dash-rank-desc">Algoritmanın besinisin. Uyku modunda.</div>
+          <div class="rank-legend">
+            <div class="rl-item"><span class="rl-dot" style="background:var(--red)"></span><span class="rl-range">0–100 XP</span><span class="rl-name r-zombie">ZOMBİ</span></div>
+            <div class="rl-item"><span class="rl-dot" style="background:var(--violet)"></span><span class="rl-range">101–500 XP</span><span class="rl-name r-awakening">UYANIŞTA</span></div>
+            <div class="rl-item"><span class="rl-dot" style="background:var(--green)"></span><span class="rl-range">501+ XP</span><span class="rl-name r-guide">OCULİ REHBERİ</span></div>
+          </div>
+        </div>
+
+        <div class="dash-card dash-card--xp">
+          <div class="dash-card-label">HUMANITY XP</div>
+          <div id="dash-xp-value" class="dash-xp-big">0 XP</div>
+          <div class="dash-xp-bar-wrap"><div id="dash-xp-bar-fill" class="dash-xp-bar-fill"></div></div>
+          <div class="dash-xp-legend">
+            <span class="xp-gain">+5 XP/sn — insan sesi</span>
+            <span class="xp-loss">-2 XP/10sn — Gatur aktif</span>
+          </div>
+        </div>
+
+        <div class="dash-card dash-card--stats">
+          <div class="dash-card-label">İSTATİSTİKLER</div>
+          <div class="dash-stat-row"><span class="dash-stat-key">KURTARILAN SÜRE</span><span class="dash-stat-val" id="dash-rescued">0sn</span></div>
+          <div class="dash-stat-row"><span class="dash-stat-key">GATUR ETKİSİ</span><span class="dash-stat-val" id="dash-gatur-effect">AKTİF</span></div>
+          <div class="dash-stat-row"><span class="dash-stat-key">KAYDEDİLDİ</span><span class="dash-stat-val accent-green">EVET (local)</span></div>
+          <button id="dash-reset-btn" class="secondary-btn danger-btn dash-reset-btn">↺ XP SIFIRLA</button>
+        </div>
+
       </div>
     </section>
 
@@ -233,6 +280,23 @@
           <cite>— Project Oculi, 2025</cite>
         </div>
 
+        <div class="manifesto-block">
+          <span class="manifesto-num">05</span>
+          <div class="manifesto-text">
+            <h3>Rütben Senin Gerçekliğindir</h3>
+            <p>
+              Sistem seni <em>"takipçi"</em> sayınla ölçer; biz ise insanlık frekansınla.
+              Eğer rütben <strong>Zombi</strong> ise, algoritmanın sadece bir besinisin —
+              sessiz, görünmez ve tüketilebilir. <strong>Rehber</strong> rütbesine ulaştığında
+              ise, paraziti dağıtan bir ışık kaynağına dönüşürsün. Kazandığın her XP,
+              seni algoritmik bir kopyadan <em>gerçek bir insana</em> dönüştürür.
+            </p>
+            <p style="margin-top:16px">
+              Seçim senin: <strong>Veri havuzunda boğulmak mı, yoksa frekansı yönetmek mi?</strong>
+            </p>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -240,8 +304,9 @@
     <footer id="site-footer">
       <div class="footer-inner">
         <span class="footer-tag">[ PROJECT OCULI ]</span>
-        <span class="footer-tag">// v0.1-alpha</span>
+        <span class="footer-tag">// v1.0-phase1</span>
         <span class="footer-tag">// sosyal deney</span>
+        <span class="footer-tag" id="footer-gatur-live">// küresel parazit: 87.4%</span>
       </div>
     </footer>
 
