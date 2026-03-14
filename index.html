@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PROJECT OCULI — Frekansı Kır, İnsanı Bul</title>
+  <meta name="description" content="Project Oculi — Parazit içinde kaybolan insanlığı bulmak için radikal bir sosyal deney." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════
+       BREACH SEQUENCE (Terminal Intro)
+  ══════════════════════════════════ -->
+  <div id="breach-overlay">
+    <div id="breach-terminal">
+      <div id="breach-header">
+        <span class="breach-tag">[ PROJECT OCULI // SYSTEM SCAN ]</span>
+        <span class="breach-tag" id="breach-clock"></span>
+      </div>
+      <div id="breach-lines"></div>
+      <div id="breach-progress-wrap">
+        <div id="breach-progress-bar"></div>
+      </div>
+      <div id="breach-status">INITIALIZING...</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       GLITCH OVERLAY (Gatur Filter)
+  ══════════════════════════════════ -->
+  <div id="gatur-overlay" class="gatur-active">
+    <div class="gatur-scanlines"></div>
+    <div class="gatur-noise"></div>
+    <div class="gatur-bar"></div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       MAIN CONTAINER
+  ══════════════════════════════════ -->
+  <main id="main-content" class="hidden">
+
+    <!-- HEADER -->
+    <header id="site-header">
+      <div class="header-inner">
+        <div class="logo">
+          <span class="logo-bracket">[</span>
+          OCULI
+          <span class="logo-bracket">]</span>
+        </div>
+        <nav class="site-nav">
+          <a href="#manifesto">MANİFESTO</a>
+          <a href="#sensor">SENSÖR</a>
+          <a href="#ar-view">LENS</a>
+        </nav>
+        <div class="header-signal">
+          <span id="signal-dot"></span>
+          <span id="signal-label">OFFLINE</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ══ HERO ══ -->
+    <section id="hero">
+      <div class="hero-inner">
+        <p class="hero-pre">// deneysel sosyal protokol v0.1</p>
+        <h1 id="hero-title">
+          <span class="glitch-text" data-text="FREKANSINI">FREKANSINI</span><br/>
+          <span class="glitch-text" data-text="BUL.">BUL.</span>
+        </h1>
+        <p class="hero-sub">
+          Ekran seni tüketiyor. <br/>
+          Sesin geri alabilir.<br/>
+          <em>İnsan sesi. 85 Hz. 255 Hz.</em>
+        </p>
+
+        <!-- RED PILL CTA -->
+        <button id="red-pill-btn" aria-label="Kırmızı hapı yut - kamerayı etkinleştir">
+          <span class="pill-inner">
+            <span class="pill-icon">●</span>
+            KIRMIZI HAPIYI YUT
+          </span>
+          <span class="pill-glow"></span>
+        </button>
+
+        <p class="hero-warning">
+          <span class="warn-icon">⚠</span>
+          Kameranıza ve mikrofonunuza erişim talep edilecek.
+        </p>
+      </div>
+
+      <!-- Decorative grid lines -->
+      <div class="hero-grid" aria-hidden="true">
+        <div class="g-line"></div><div class="g-line"></div>
+        <div class="g-line"></div><div class="g-line"></div>
+        <div class="g-line"></div>
+      </div>
+    </section>
+
+    <!-- ══ AR SENSOR SECTION ══ -->
+    <section id="sensor">
+      <div class="section-label">// Ses Analiz Motoru</div>
+      <h2 class="section-title">GATUR FİLTRESİ</h2>
+      <p class="section-desc">
+        Sisteme göre sen bir <strong>veri noktasısın</strong>.<br/>
+        Konuş. Frekansını kanıtla. Glitch'i kır.
+      </p>
+
+      <div id="audio-panel">
+        <div id="freq-visualizer">
+          <canvas id="freq-canvas" width="600" height="120"></canvas>
+          <div id="freq-label">— BEKLEMEDE —</div>
+        </div>
+        <div id="audio-status-grid">
+          <div class="stat-cell">
+            <span class="stat-key">DURUM</span>
+            <span class="stat-val" id="stat-status">PASİF</span>
+          </div>
+          <div class="stat-cell">
+            <span class="stat-key">FREKANS</span>
+            <span class="stat-val" id="stat-freq">— Hz</span>
+          </div>
+          <div class="stat-cell">
+            <span class="stat-key">İNSAN SESİ</span>
+            <span class="stat-val" id="stat-human">HAYIR</span>
+          </div>
+          <div class="stat-cell">
+            <span class="stat-key">GATUR</span>
+            <span class="stat-val" id="stat-gatur">AKTİF</span>
+          </div>
+        </div>
+      </div>
+
+      <button id="mic-btn" class="secondary-btn" aria-label="Mikrofonu etkinleştir">
+        MİKROFONU ETKİNLEŞTİR
+      </button>
+    </section>
+
+    <!-- ══ AR VIEW SECTION ══ -->
+    <section id="ar-view" class="hidden-section">
+      <div class="section-label">// AR Protokolü</div>
+      <h2 class="section-title">LENS AKTİF</h2>
+      <div id="camera-container">
+        <video id="camera-feed" autoplay playsinline muted></video>
+        <div id="camera-overlay">
+          <div class="cam-corner tl"></div>
+          <div class="cam-corner tr"></div>
+          <div class="cam-corner bl"></div>
+          <div class="cam-corner br"></div>
+          <div id="cam-reticle"></div>
+          <div id="cam-info">
+            <span>HEDEF TARANİYOR...</span>
+          </div>
+        </div>
+      </div>
+      <button id="stop-cam-btn" class="secondary-btn danger-btn">LENSI KAPAT</button>
+    </section>
+
+    <!-- ══ MANİFESTO ══ -->
+    <section id="manifesto">
+      <div class="section-label">// Manifesto v1.0 — Project Oculi</div>
+      <h2 class="section-title">FREKANSINI KIR.<br/><span class="accent-red">İNSANI BUL.</span></h2>
+
+      <div class="manifesto-body">
+
+        <div class="manifesto-block">
+          <span class="manifesto-num">01</span>
+          <div class="manifesto-text">
+            <h3>Ekran Bir Kafes Değil, Ama Seni Tutmaya Devam Ediyor</h3>
+            <p>
+              Sabahın 3'ünde yatak odanda, bir ekranın mavi ışığında oturuyorsun.
+              Kimse seni zorlamadı. Kimse seni zincirlere vurmadı.
+              Ama işte buradasın. Çünkü sistem <em>bağımlılık için tasarlandı</em>,
+              özgürlük için değil. Algoritma seni tanıyor. Korkularını, arzularını,
+              yalnızlığını biliyor. Ve bunları sana geri satıyor.
+            </p>
+          </div>
+        </div>
+
+        <div class="manifesto-block">
+          <span class="manifesto-num">02</span>
+          <div class="manifesto-text">
+            <h3>Gatur: Sistemin Adı</h3>
+            <p>
+              "Gatur" dediğimizde şunu kastediyoruz: Dikkat ekonomisinin,
+              parazitli bir örtü gibi gerçekliğinin üzerine serilen o katmanı.
+              Ekranındaki her bildirim bir <strong>elektriksel dürtü</strong>.
+              Her sonsuz kaydırma, dopamininin tükenmesidir.
+              Görmek istediğin her şeyin arkasında seni gören bir göz var.
+              Biz ona Gatur diyoruz.
+            </p>
+          </div>
+        </div>
+
+        <div class="manifesto-block">
+          <span class="manifesto-num">03</span>
+          <div class="manifesto-text">
+            <h3>85 Hz'den 255 Hz'e: İnsanın Frekansı</h3>
+            <p>
+              İnsan sesi bir aralıkta titreşir. 85 Hz ile 255 Hz arasında,
+              bir konuşmanın tüm insani yükü taşınır — keder, sevinç, öfke, sevgi.
+              Bu frekans aralığı <strong>bir impulstur</strong>. Sistemin anlayamadığı,
+              satamadığı, algoritmaya sığdıramadığı tek şey: gerçek, canlı,
+              dijital omurganın dışına taşan bir insan sesi.
+              Konuş. Frekansın, Gatur'u kıracak.
+            </p>
+          </div>
+        </div>
+
+        <div class="manifesto-block">
+          <span class="manifesto-num">04</span>
+          <div class="manifesto-text">
+            <h3>Oculi: İzleyen Göz</h3>
+            <p>
+              Project Oculi bir araç değil, bir <strong>ayna</strong>.
+              Seni izleyen sistemi geri izlemek için tasarlandı.
+              Kameran açıldığında, yönü tersine çeviririz.
+              Artık sen bakıyorsun. Artık sen görüyorsun.
+              Sistemin sende bıraktığı hasarı, glitch'in dağıtık dilinde okuyorsun.
+              Bu bir oyun değil. Bu gerçek.
+            </p>
+          </div>
+        </div>
+
+        <div class="manifesto-block manifesto-credo">
+          <blockquote>
+            "Susma. Çünkü sessizlik parazit içinde kaybolur.<br/>
+            Konuş. Çünkü sesin frekansı bir silah.<br/>
+            <strong>Frekansını kır. İnsanı bul.</strong>"
+          </blockquote>
+          <cite>— Project Oculi, 2025</cite>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer id="site-footer">
+      <div class="footer-inner">
+        <span class="footer-tag">[ PROJECT OCULI ]</span>
+        <span class="footer-tag">// v0.1-alpha</span>
+        <span class="footer-tag">// sosyal deney</span>
+      </div>
+    </footer>
+
+  </main>
+
+  <script src="core.js"></script>
+</body>
+</html>
