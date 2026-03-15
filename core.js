@@ -93,6 +93,7 @@ let notifInterval = 2500;
 let tranceHeat = 0;
 let tranceHeatActive = false;
 let tranceWarningEl = null;
+let tranceProgress = 0; // 0 to 100 for Phase B transition
 
 function registerTrancePunishment() {
   const t = document.getElementById('aw-trance');
@@ -100,32 +101,61 @@ function registerTrancePunishment() {
   if (!t) return;
   tranceHeatActive = true;
   tranceHeat = 0;
+  tranceProgress = 0;
 
   const punish = (e) => {
     if (!tranceHeatActive) return;
-    tranceHeat += 15; // big boost
+    tranceHeat += 20; // boost
     if (tranceHeat > 100) tranceHeat = 100;
+    spawnFloatingWait(e.clientX || (e.touches && e.touches[0].clientX), e.clientY || (e.touches && e.touches[0].clientY));
   };
 
-  t.addEventListener('mousemove', () => { if(tranceHeatActive) tranceHeat += 0.8; });
+  t.addEventListener('mousemove', (e) => {
+    if(!tranceHeatActive) return;
+    tranceHeat += 1.2;
+    if (Math.random() > 0.92) spawnFloatingWait(e.clientX, e.clientY);
+  });
   t.addEventListener('mousedown', punish);
   t.addEventListener('touchstart', punish);
-  window.addEventListener('keydown', punish);
+  window.addEventListener('keydown', (e) => punish({clientX: window.innerWidth/2, clientY: window.innerHeight/2}));
 
-  // Decay loop
-  const decay = setInterval(() => {
-    if (!tranceHeatActive) { clearInterval(decay); return; }
-    if (tranceHeat > 0) tranceHeat -= 2;
+  // Decay & Progress loop
+  const loop = setInterval(() => {
+    if (!tranceHeatActive) { clearInterval(loop); return; }
+
+    // Heat decay
+    if (tranceHeat > 0) tranceHeat -= 2.5;
     if (tranceHeat < 0) tranceHeat = 0;
+
+    // Progression logic
+    if (tranceHeat < 15) {
+      // User is still -> progress!
+      tranceProgress += 0.8;
+    } else if (tranceHeat > 60) {
+      // Very active -> regress!
+      tranceProgress -= 1.5;
+    }
+    if (tranceProgress < 0) tranceProgress = 0;
 
     // Visuals
     if (tranceWarningEl) {
-      tranceWarningEl.style.opacity = tranceHeat > 60 ? '1' : '0';
-      tranceWarningEl.style.transform = `translate(-50%, -50%) scale(${1 + (tranceHeat/200)})`;
-      if (tranceHeat > 80) tranceWarningEl.classList.add('glitch-active');
+      tranceWarningEl.style.opacity = tranceHeat > 50 ? '1' : '0';
+      tranceWarningEl.style.transform = `translate(-50%, -50%) scale(${1 + (tranceHeat/180)})`;
+      if (tranceHeat > 75) tranceWarningEl.classList.add('glitch-active');
       else tranceWarningEl.classList.remove('glitch-active');
     }
   }, 100);
+}
+
+function spawnFloatingWait(x, y) {
+  if (!x || !y) return;
+  const div = document.createElement('div');
+  div.className = 'floating-wait';
+  div.textContent = ['BEKLE','DUR','GERÇEk DEĞİL','SABRET','KIPIRDAMA'][Math.floor(Math.random()*5)];
+  div.style.left = x + 'px';
+  div.style.top = y + 'px';
+  document.getElementById('aw-trance').appendChild(div);
+  setTimeout(() => div.remove(), 1000);
 }
 
 function startFakeNotifications() {
@@ -414,7 +444,7 @@ function animateFreqNeedle() {
 
 
 /* ──────────────────────────────────────────────────
-   AWAKENING SEQUENCE  (State machine)
+   AWAKENING SEQUENCE  (Dynamic Progress machine)
 ────────────────────────────────────────────────── */
 function runAwakeningSequence() {
   const overlay  = document.getElementById('awakening-overlay');
@@ -422,38 +452,43 @@ function runAwakeningSequence() {
   const durPhase = document.getElementById('aw-dur');
   const lightPhase = document.getElementById('aw-light');
 
-  // ── PHASE A: Digital Trance (0-30s) ──
+  // Start Phase A
   startWhispers();
   startSceneCycle();
   startFakeNotifications();
   registerTrancePunishment();
 
-  // ── PHASE B: DUR. (30s) ──
-  setTimeout(() => {
-    tranceHeatActive = false; // Stop punishment
+  // Watch for progress to transition to Phase B
+  const progressCheck = setInterval(() => {
+    if (tranceProgress >= 100) {
+      clearInterval(progressCheck);
+      transitionToDur();
+    }
+  }, 200);
+
+  function transitionToDur() {
+    tranceHeatActive = false;
     if (tranceWarningEl) tranceWarningEl.style.opacity = '0';
     trance.classList.add('hidden');
     durPhase.classList.remove('hidden');
     stopWhispers();
     stopFakeNotifications();
     playDurSound();
-  }, 30000);
 
-  // ── PHASE C: Warm Light (36s) ──
-  setTimeout(() => {
-    durPhase.classList.add('hidden');
-    lightPhase.classList.remove('hidden');
-    showLightMessages();
-    playNatureSounds();
-  }, 36000);
+    // After 6s of DUR, move to Light phase
+    setTimeout(() => {
+      durPhase.classList.add('hidden');
+      lightPhase.classList.remove('hidden');
+      showLightMessages();
+      playNatureSounds();
+    }, 6000);
+  }
 
-  // ── Click / auto-reveal after light messages ──
+  // Auto-reveal buttons wiring
   const cta = document.getElementById('awl-5');
   if (cta) {
     cta.addEventListener('click', () => revealMain(overlay));
   }
-  // Auto-reveal safety at 54s
-  setTimeout(() => revealMain(overlay), 54000);
 }
 
 /* ── Scene cycling ── */

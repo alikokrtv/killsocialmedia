@@ -240,18 +240,28 @@ body.awakened #gatur-overlay { opacity: 0 !important; pointer-events: none; }
 /* TRANCE PUNISHMENT WARNING */
 #trance-warning {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  z-index: 500; font-family: var(--mono); font-size: 24px; color: var(--red);
-  text-align: center; text-transform: uppercase; letter-spacing: 4px;
+  z-index: 500; font-family: var(--mono); font-size: 32px; color: var(--red);
+  text-align: center; text-transform: uppercase; letter-spacing: 6px;
   opacity: 0; pointer-events: none; transition: opacity 0.3s;
-  text-shadow: 0 0 10px var(--red);
+  text-shadow: 0 0 20px rgba(255,0,0,0.6);
+  font-weight: 900;
 }
 .glitch-active {
   animation: glitch-vibrate 0.1s infinite;
+  color: #fff;
+  text-shadow: 2px 0 var(--violet), -2px 0 var(--red);
 }
-@keyframes glitch-vibrate {
-  0% { transform: translate(-50%, -50%) translate(2px, 2px); }
-  50% { transform: translate(-50%, -50%) translate(-2px, -2px); }
-  100% { transform: translate(-50%, -50%) translate(1px, -1px); }
+
+.floating-wait {
+  position: fixed; pointer-events: none; z-index: 550;
+  font-family: var(--mono); font-size: 14px; color: var(--violet);
+  text-shadow: 0 0 5px var(--violet);
+  text-transform: uppercase; letter-spacing: 2px;
+  animation: float-up-fade 1s forwards;
+}
+@keyframes float-up-fade {
+  0% { transform: translate(-50%, 0); opacity: 0.8; }
+  100% { transform: translate(-50%, -40px); opacity: 0; }
 }
 
 #aw-hint {
