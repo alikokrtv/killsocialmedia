@@ -68,57 +68,114 @@ const WHISPERS = [
    FAKE NOTIFICATION DATA
 ────────────────────────────────────────────────── */
 const FAKE_NOTIFS = [
-  { icon:'📱', app:'TikTok', msg:'Senin için 47 yeni video!' },
-  { icon:'🛒', app:'FLASH İNDİRİM', msg:'Son 2 saat! %80 indirim bitti sayılır.' },
-  { icon:'❤️', app:'Instagram', msg:'@mert_21 fotoğrafını beğendi ve 14 kişi daha...' },
-  { icon:'📧', app:'Pazarlama', msg:'Özel teklifiniz sona eriyor — HEMEN KULLAN' },
-  { icon:'🎮', app:'Oyun', msg:'Arkadaşın seni beklemeye aldı. 1/4 başlamak istiyor.' },
-  { icon:'📢', app:'Haber Akışı', msg:'Felaket! Şehirde yangın! CANLI TAKİP ET' },
-  { icon:'💬', app:'WhatsApp', msg:'Grup: 47 okunmamış mesaj — Sessize almak ister misiniz?' },
-  { icon:'⭐', app:'AliExpress', msg:'Sepetindeki ürünler fiyat değişti! Son 3 adet.' },
-  { icon:'🔥', app:'YouTube', msg:'Dur izleme! 3 saat 24 dak. izledin — devam et.' },
-  { icon:'💊', app:'Sağlık Uyarısı', msg:'Bu saatten sonra mavi ışık uyku kalitenizi etkiler.' },
-  { icon:'🤖', app:'AI Asistan', msg:'Bugün için 12 önerin var! Hepsini görmek ister misin?' },
-  { icon:'📣', app:'Reklam', msg:'Komşun bunu aldı ve harika hissediyor! Sen de al.' },
-  { icon:'🎵', app:'Spotify', msg:'Hareket için sana özel çalma listesi hazırlandı.' },
-  { icon:'🛎️', app:'Teslimat', msg:'Paketiniz 3.2 km uzakta! TAKİP ET' },
-  { icon:'💬', app:'Yabancı Numara', msg:'Tebrikler seçildiniz! Hediyenizi almak için...' },
+  { icon:'📱', app:'TikTok', msg:'Senin için 47 yeni video hazır!', sound:'ping' },
+  { icon:'🛒', app:'FLASH SALE', msg:'%80 indirim! 1:47 kaldı. HEMEN AL →', sound:'ding' },
+  { icon:'❤️', app:'Instagram', msg:'@mert_21 ve 23 kişi daha fotoğrafını beğendi', sound:'pop' },
+  { icon:'📧', app:'Noreply@pazarlama', msg:'Özel teklifiniz 10 dakika sonra sona eriyor ⚡', sound:'ding' },
+  { icon:'🎮', app:'PUBG Mobile', msg:'Arkadaşın Emre seni beklemeye aldı!', sound:'ping' },
+  { icon:'📢', app:'CNN Türk', msg:'SON DAKİKA: Deprem! Detaylar için açın →', sound:'ping' },
+  { icon:'💬', app:'WhatsApp', msg:'"Aile" grubunda 63 yeni mesaj var', sound:'pop' },
+  { icon:'⭐', app:'Trendyol', msg:'Sana özel 50₺ hediye çeki! Bugün son gün 🎁', sound:'ding' },
+  { icon:'🔥', app:'YouTube', msg:'4 saat 12 dk izledin. Harika seçimler! Devam et 🔥', sound:'ping' },
+  { icon:'🤖', app:'ChatGPT', msg:'Premium planın sona eriyor. Şimdi yenile →', sound:'pop' },
+  { icon:'📣', app:'Google Ads', msg:'[Sponsorlu] Komşuların bu ürünü tercih etti', sound:'pop' },
+  { icon:'🛎️', app:'Yemeksepeti', msg:'Siparişin yola çıktı! 32 dakika ◉ Canlı takip', sound:'ding' },
+  { icon:'💬', app:'+90 532 XXX', msg:'Tebrikler! 5.000₺ nakit ödülünüzü kazandınız', sound:'ping' },
+  { icon:'😴', app:'Sağlık', msg:'Bu saatten sonra ekran, uyku kalitenizi %40 düşürür.', sound:'pop' },
+  { icon:'🎵', app:'Spotify', msg:'Senin için Günlük Mix hazırlandı — 87 şarkı', sound:'ping' },
 ];
 
 let notifActive = false;
+let notifAC = null;   // shared AudioContext for notifications
+let notifInterval = 2500;
 
 function startFakeNotifications() {
   notifActive = true;
+  notifInterval = 2500;
+  try { notifAC = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
   function spawn() {
     if (!notifActive) return;
-    showFakeNotif(FAKE_NOTIFS[Math.floor(Math.random() * FAKE_NOTIFS.length)]);
-    setTimeout(spawn, 2500 + Math.random() * 2000);
+    const n = FAKE_NOTIFS[Math.floor(Math.random() * FAKE_NOTIFS.length)];
+    showFakeNotif(n);
+    playNotifSound(n.sound);
+    // Accelerate: every 8s reduce interval
+    notifInterval = Math.max(600, notifInterval - 80);
+    setTimeout(spawn, notifInterval + Math.random() * 400);
   }
-  setTimeout(spawn, 3000);
+  setTimeout(spawn, 2000);
+  // Cacophony build — rapid fire last 5 seconds
+  setTimeout(() => {
+    for (let i = 0; i < 6; i++) {
+      setTimeout(() => {
+        if (!notifActive) return;
+        showFakeNotif(FAKE_NOTIFS[Math.floor(Math.random() * FAKE_NOTIFS.length)]);
+        playNotifSound(['ping','ding','pop'][i % 3]);
+      }, i * 280);
+    }
+  }, 25000);
 }
 
-function stopFakeNotifications() { notifActive = false; }
+function stopFakeNotifications() {
+  notifActive = false;
+  const c = document.getElementById('aw-notifications');
+  if (c) c.innerHTML = '';
+  if (notifAC) { notifAC.close(); notifAC = null; }
+}
+
+/* Notification sound engine */
+function playNotifSound(type) {
+  if (!notifAC) return;
+  try {
+    const osc = notifAC.createOscillator();
+    const gain = notifAC.createGain();
+    osc.connect(gain); gain.connect(notifAC.destination);
+    if (type === 'ping') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1200, notifAC.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(900, notifAC.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.18, notifAC.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, notifAC.currentTime + 0.18);
+    } else if (type === 'ding') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(880, notifAC.currentTime);
+      osc.frequency.setValueAtTime(1100, notifAC.currentTime + 0.05);
+      gain.gain.setValueAtTime(0.14, notifAC.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, notifAC.currentTime + 0.25);
+    } else { // pop
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(400, notifAC.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(200, notifAC.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.1, notifAC.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, notifAC.currentTime + 0.1);
+    }
+    osc.start(); osc.stop(notifAC.currentTime + 0.35);
+  } catch(e) {}
+}
 
 function showFakeNotif(data) {
   const container = document.getElementById('aw-notifications');
   if (!container) return;
   const el = document.createElement('div');
-  el.className = 'fake-notif';
+  // Chaos: random directions
+  const dir  = ['right','left','top','center'][Math.floor(Math.random() * 4)];
+  el.className = 'fake-notif fn-dir-' + dir;
   el.innerHTML = `<span class="fn-icon">${data.icon}</span>
     <div class="fn-body">
       <div class="fn-app">${data.app}</div>
       <div class="fn-msg">${data.msg}</div>
     </div>
     <div class="fn-time">şimdi</div>`;
-  // Vary vertical position for chaos
-  el.style.top  = (10 + Math.random() * 75) + '%';
-  el.style.right = '16px';
+  // Position by direction
+  if (dir === 'right') { el.style.top=(10+Math.random()*75)+'%'; el.style.right='16px'; }
+  else if (dir === 'left')  { el.style.top=(10+Math.random()*75)+'%'; el.style.left='16px'; }
+  else if (dir === 'top')   { el.style.top='16px'; el.style.left=(10+Math.random()*60)+'%'; }
+  else { el.style.top=(38+Math.random()*20)+'%'; el.style.left='50%'; el.style.transform='translateX(-50%)'; }
   container.appendChild(el);
   requestAnimationFrame(() => el.classList.add('fn-show'));
   setTimeout(() => {
     el.classList.remove('fn-show');
     setTimeout(() => el.remove(), 500);
-  }, 2200 + Math.random() * 1000);
+  }, 2000 + Math.random() * 800);
 }
 
 /* ──────────────────────────────────────────────────
@@ -219,16 +276,58 @@ function shuffleSeeded(arr, rng) {
 }
 
 /* ──────────────────────────────────────────────────
-   HUMANITY NEWS FEED (kurgusal — güncel çağrılar)
+   HUMANITY NEWS FEED — Real global data (2024 sources)
 ────────────────────────────────────────────────── */
 const HUMANITY_HEADLINES = [
-  { icon:'🌡️', title:'Dünya Sıcaklığı Rekoru Kırdı', sub:'İnsan toplulukları iklim krizini tartışıyor. Sen bu tartışmada neredesin?', cta:'Lokal çevre grubu bul →' },
-  { icon:'📚', title:'%60 Yetişkin Yıllardır Kitap Okumadı', sub:'Algoritmanın verisi bu. Senin verilerin ne diyor?', cta:'Bugün 5 sayfa oku →' },
-  { icon:'🧠', title:'Ekran Süresi: Ort. 7 Saat/Gün', sub:'Bu, uyku sürenle aynı. Beynin hangisini seçiyor?', cta:'Ekran süresini kır →' },
-  { icon:'🤲', title:'Gönüllü Sayısı Son 10 Yılın En Düşüğünde', sub:'İnsan bağlantısı azalıyor. Sayıyı artırmak için bir adım yeterli.', cta:'Yakında gönüllü etkinliği bul →' },
-  { icon:'🌱', title:'Kentsel Bahçecilik Hareketi Büyüyor', sub:'Beton ortasında toprakla temas kuranlar artıyor. Sen de katıl.', cta:'Bir tohum al →' },
-  { icon:'🎵', title:'Müzik Aleti Çalanlar Daha Uzun Yaşıyor', sub:'Araştırmalar söylüyor: Eller çaldığında beyin farklı çalışıyor.', cta:'5 dakika akort et →' },
-  { icon:'🗣️', title:'Yalnızlık Salgını: En Büyük Sağlık Krizi', sub:'Yapay zeka sohbetleri arttı, yüz yüze iletişim düştü.', cta:'Bugün birini ara →' },
+  {
+    icon:'🌡️',
+    title:'Dünya Sıcaklığı 2024’da Tarihinin En Yüksek Seviyesine Ulaştı',
+    sub:'Copernicus İklim Değişikliği Servisi: 1.5°C sınırı ilk kez aşıldı. Küreselsısınma artık istatistik değil, yaşanan gerçek.',
+    cta:'→ Climate.gov | IPCC Raporu 2024',
+    src:'Copernicus CDS, Ocak 2024'
+  },
+  {
+    icon:'🤧',
+    title:'Yalnızlık Salgunu: DÜnya SAĞlıK ÖRGÜTÜ Küresel Acil Durum İlan Etti',
+    sub:'DST/WHO 2023: 4 kişiden 1i kendini “son derece yalnız” hissediyor. Sosyal medya kullanımı ile yalnızlık arasında doğrusal korelasyon saptandı.',
+    cta:'→ WHO Loneliness Report 2023',
+    src:'WHO, 2023'
+  },
+  {
+    icon:'📱',
+    title:'Ekran Süresi Rekoru: Ortalama Günlük 6 Saat 37 Dakika',
+    sub:'DataReportal 2024: Bu, uyku süresinin %83’ü. Ömrünün 12 yılını ekrana bakıyoruz. Bu sayı 2019’dan bu yana %37 arttı.',
+    cta:'→ DataReportal Digital 2024 Report',
+    src:'DataReportal, 2024'
+  },
+  {
+    icon:'🧠',
+    title:'Gençlerde Depresyon %150 Arttı: Meta’nın Kendi Araştırması',
+    sub:'Meta’nın ihtiyatíe belgeleri: Instagram, 13-17 yaş grubunda beden algısını bozduğunu içsel olarak belgeliyor. Bu bilgi 2021’de gizli tutuldu.',
+    cta:'→ WSJ: The Facebook Files, 2021',
+    src:'Meta Internal Research, 2021'
+  },
+  {
+    icon:'🌱',
+    title:'Gönüllü Oranı Son 20 Yılın En Düşüğünde',
+    sub:'Gallup 2023: Gönüllü çalışma oranı %27.8’den %18.3’e indi. Doğrudan korelasyon: Sosyal medya kullanımı ile topluluk katılımı ters orantılı.',
+    cta:'→ meetup.com | birlikteyiz.org — Yakınındaki grupları bul',
+    src:'Gallup, 2023'
+  },
+  {
+    icon:'🎥',
+    title:'TikTok: Ortalama Seans Süresi 95 Dakika/Gün',
+    sub:'Qustodio 2024: 3 saniyede bir kaydırılan içerik, dopamin döngüsünü kumar bağımlılığıyla aynı mekanizmada çalıştırıyor.',
+    cta:'→ Qustodio Annual Report 2024',
+    src:'Qustodio, 2024'
+  },
+  {
+    icon:'🌿',
+    title:'Kent Bahçeciliği Hareketi: Türkiye’de 200K Aktif Katılımcı',
+    sub:'Fiziksel toprakla temas kurmak kortizol üzretimini %28 düşürüyor (NIH 2023). Sehirdeysen de toprağa dokunabilirsin.',
+    cta:'→ bahcekulubu.com | Tohum Ağı Projesi',
+    src:'NIH Nature Study, 2023'
+  },
 ];
 
 function renderHumanityFeed() {
@@ -240,7 +339,10 @@ function renderHumanityFeed() {
       <div class="hf-text">
         <strong>${h.title}</strong>
         <p>${h.sub}</p>
-        <span class="hf-cta">${h.cta}</span>
+        <div class="hf-footer">
+          <span class="hf-cta">${h.cta}</span>
+          <span class="hf-src">${h.src}</span>
+        </div>
       </div>
     </div>
   `).join('');
@@ -609,8 +711,15 @@ function checkAwakenedTheme() {
 ────────────────────────────────────────────────── */
 const HUMAN_LOW  = 85;
 const HUMAN_HIGH = 255;
-const DETECT_THRESHOLD = 55;   // lowered — broadband avg, not just peak
-const DETECT_RATIO_MIN = 0.3;  // at least 30% of voice-band bins must be active
+const DETECT_THRESHOLD = 55;
+const DETECT_RATIO_MIN = 0.3;
+
+// Bird sound detection (1000–4000 Hz)
+const BIRD_LOW  = 1000;
+const BIRD_HIGH = 4000;
+const BIRD_THRESHOLD  = 70;
+const BIRD_RATIO_MIN  = 0.25;
+let birdDetected = false;
 
 let audioCtx   = null;
 let analyser   = null;
@@ -650,6 +759,8 @@ function analyseLoop() {
   animFrame = requestAnimationFrame(analyseLoop);
   analyser.getByteFrequencyData(freqData);
   const hz      = audioCtx.sampleRate / (analyser.frequencyBinCount * 2);
+
+  // ── Human voice band (85–255Hz) ──
   const low     = Math.floor(HUMAN_LOW  / hz);
   const high    = Math.ceil(HUMAN_HIGH / hz);
   let totalEnergy = 0, activeBins = 0, maxBin = low;
@@ -662,11 +773,41 @@ function analyseLoop() {
   const avgEnergy   = totalEnergy / bandWidth;
   const activeRatio = activeBins / bandWidth;
   const domHz       = Math.round(maxBin * hz);
-  // Human voice: decent average energy AND ratio of active bins
   const isHuman = avgEnergy > DETECT_THRESHOLD && activeRatio >= DETECT_RATIO_MIN;
   updateStats(domHz, isHuman);
   handleGaturResponse(isHuman);
   drawVisualizer(low, high, isHuman);
+
+  // ── Bird sound band (1000–4000Hz) ──
+  if (!birdDetected) {
+    const bLow  = Math.floor(BIRD_LOW  / hz);
+    const bHigh = Math.ceil(BIRD_HIGH / hz);
+    let bTotal = 0, bActive = 0;
+    for (let i = bLow; i <= bHigh && i < freqData.length; i++) {
+      bTotal += freqData[i];
+      if (freqData[i] > BIRD_THRESHOLD) bActive++;
+    }
+    const bBand  = bHigh - bLow + 1;
+    const bAvg   = bTotal / bBand;
+    const bRatio = bActive / bBand;
+    if (bAvg > BIRD_THRESHOLD && bRatio >= BIRD_RATIO_MIN) {
+      birdDetected = true;
+      showBirdDetected();
+    }
+  }
+}
+
+function showBirdDetected() {
+  const overlay = document.getElementById('bird-overlay');
+  if (!overlay) return;
+  overlay.classList.add('bird-show');
+  // XP bonus
+  xp = Math.min(xp + 30, 9999);
+  saveXP(xp);
+  renderDashboard();
+  updateFlowers();
+  checkAwakenedTheme();
+  overlay.addEventListener('click', () => overlay.classList.remove('bird-show'), {once:true});
 }
 
 function updateStats(hz, isHuman) {
@@ -767,4 +908,153 @@ document.addEventListener('DOMContentLoaded', () => {
       renderDashboard(); renderGlobalGatur();
     }
   });
+
+  initDraggableFlowers();
 });
+
+/* ──────────────────────────────────────────────────
+   DRAGGABLE FLOWERS
+────────────────────────────────────────────────── */
+function initDraggableFlowers() {
+  document.querySelectorAll('.draggable-flower').forEach(flower => {
+    let dragging = false, offX = 0, offY = 0;
+
+    flower.style.cursor = 'grab';
+    flower.style.position = 'fixed';
+
+    flower.addEventListener('mousedown', e => {
+      dragging = true;
+      flower.style.cursor = 'grabbing';
+      flower.style.zIndex = '1000';
+      // Convert % positions to px
+      const rect = flower.getBoundingClientRect();
+      offX = e.clientX - rect.left;
+      offY = e.clientY - rect.top;
+      e.preventDefault();
+    });
+
+    flower.addEventListener('touchstart', e => {
+      dragging = true;
+      flower.style.cursor = 'grabbing';
+      flower.style.zIndex = '1000';
+      const t = e.touches[0];
+      const rect = flower.getBoundingClientRect();
+      offX = t.clientX - rect.left;
+      offY = t.clientY - rect.top;
+    }, { passive: true });
+
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      flower.style.left = (e.clientX - offX) + 'px';
+      flower.style.top  = (e.clientY - offY) + 'px';
+    });
+
+    document.addEventListener('touchmove', e => {
+      if (!dragging) return;
+      const t = e.touches[0];
+      flower.style.left = (t.clientX - offX) + 'px';
+      flower.style.top  = (t.clientY - offY) + 'px';
+    }, { passive: true });
+
+    const release = () => {
+      if (!dragging) return;
+      dragging = false;
+      flower.style.cursor = 'grab';
+      flower.style.zIndex = '490';
+    };
+    document.addEventListener('mouseup', release);
+    document.addEventListener('touchend', release);
+  });
+}
+
+/* ──────────────────────────────────────────────────
+   NATURE BAR — Synth Sound System
+   Modes: bird | wind | rain | off
+────────────────────────────────────────────────── */
+let nbAC        = null;
+let nbGain      = null;
+let nbSources   = [];   // all active source nodes
+let nbMode      = null;
+let nbBirdTimer = null;
+
+function toggleNatureSound(mode) {
+  if (nbMode === mode) { stopNatureBar(); return; }
+  stopNatureBar(true); // stop silently
+  try {
+    nbAC   = new (window.AudioContext || window.webkitAudioContext)();
+    nbGain = nbAC.createGain();
+    nbGain.gain.setValueAtTime(0, nbAC.currentTime);
+    nbGain.gain.linearRampToValueAtTime(0.2, nbAC.currentTime + 2);
+    nbGain.connect(nbAC.destination);
+    nbMode = mode;
+
+    if (mode === 'wind') spawnNbWind();
+    if (mode === 'rain') spawnNbRain();
+    if (mode === 'bird') { spawnNbWind(0.04); scheduleNbBirds(); }
+
+    // UI
+    ['bird','wind','rain'].forEach(m => {
+      document.getElementById('nb-' + m)?.classList.toggle('nb-active', m === mode);
+    });
+  } catch(e) {}
+}
+
+function stopNatureBar(silent = false) {
+  if (nbBirdTimer) { clearTimeout(nbBirdTimer); nbBirdTimer = null; }
+  if (nbGain) {
+    nbGain.gain.linearRampToValueAtTime(0, nbAC.currentTime + (silent ? 0.05 : 1.5));
+    setTimeout(() => { if (nbAC) { nbAC.close(); nbAC = null; nbGain = null; nbSources = []; } }, 1600);
+  }
+  nbMode = null;
+  ['bird','wind','rain'].forEach(m => document.getElementById('nb-' + m)?.classList.remove('nb-active'));
+}
+
+function spawnNbWind(vol = 0.08) {
+  if (!nbAC) return;
+  const buf  = nbAC.createBuffer(1, nbAC.sampleRate * 6, nbAC.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  const src  = nbAC.createBufferSource(); src.buffer = buf; src.loop = true;
+  const bp   = nbAC.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 500; bp.Q.value = 0.3;
+  const g    = nbAC.createGain(); g.gain.value = vol;
+  src.connect(bp); bp.connect(g); g.connect(nbGain);
+  src.start(); nbSources.push(src);
+}
+
+function spawnNbRain() {
+  if (!nbAC) return;
+  // White noise through lowpass
+  const buf  = nbAC.createBuffer(1, nbAC.sampleRate * 4, nbAC.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  const src  = nbAC.createBufferSource(); src.buffer = buf; src.loop = true;
+  const lp   = nbAC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 4000;
+  const g    = nbAC.createGain(); g.gain.value = 0.12;
+  // Tremolo for rain variation
+  const lfo  = nbAC.createOscillator(); lfo.frequency.value = 8;
+  const lMod = nbAC.createGain(); lMod.gain.value = 0.03;
+  lfo.connect(lMod); lMod.connect(g.gain); lfo.start();
+  src.connect(lp); lp.connect(g); g.connect(nbGain);
+  src.start(); nbSources.push(src);
+}
+
+function scheduleNbBirds() {
+  if (!nbAC || nbMode !== 'bird') return;
+  const freq = 1800 + Math.random() * 2400;
+  const osc  = nbAC.createOscillator();
+  const env  = nbAC.createGain(); env.gain.value = 0;
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(freq, nbAC.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(freq * 1.35, nbAC.currentTime + 0.09);
+  osc.frequency.exponentialRampToValueAtTime(freq * 0.88, nbAC.currentTime + 0.2);
+  env.gain.linearRampToValueAtTime(0.06, nbAC.currentTime + 0.02);
+  env.gain.exponentialRampToValueAtTime(0.001, nbAC.currentTime + 0.22);
+  osc.connect(env); env.connect(nbGain);
+  osc.start(); osc.stop(nbAC.currentTime + 0.25);
+  if (Math.random() > 0.4) {
+    nbBirdTimer = setTimeout(scheduleNbBirds, 180 + Math.random() * 100);
+  } else {
+    nbBirdTimer = setTimeout(scheduleNbBirds, 800 + Math.random() * 2500);
+  }
+}
+

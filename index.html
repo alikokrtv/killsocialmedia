@@ -74,13 +74,27 @@
 
     <!-- PHASE C: Awakening Transition (36–52s) -->
     <div id="aw-light" class="aw-phase hidden">
-      <div id="aw-light-bg"></div>
+      <!-- Background layers -->
+      <div id="awl-sky"></div>
+      <div id="awl-sun"><div id="awl-sun-core"></div></div>
+      <div id="awl-rays"></div>
+      <div id="awl-mountains"></div>
+      <div id="awl-grass">
+        <div class="awl-tree awl-tree--left"></div>
+        <div class="awl-tree awl-tree--right"></div>
+        <div class="awl-grass-strip"></div>
+      </div>
+      <div id="awl-bird-flock">
+        <span class="awl-bird"></span><span class="awl-bird"></span>
+        <span class="awl-bird"></span><span class="awl-bird"></span>
+      </div>
+      <!-- Text overlay -->
       <div id="aw-light-msg">
-        <p class="aw-light-line" id="awl-1">Güneş hâlâ orada.</p>
-        <p class="aw-light-line" id="awl-2">Bir kuş var dışarıda.</p>
-        <p class="aw-light-line" id="awl-3">Yanında biri var.</p>
-        <p class="aw-light-line" id="awl-4">Project Oculi bir köprüdür.</p>
-        <p class="aw-light-cta" id="awl-5">Şimdi — ilerle.</p>
+        <p class="aw-light-line" id="awl-1">☀️ Güneş hâlâ orada. Seninle birlikte doğuyor.</p>
+        <p class="aw-light-line" id="awl-2">🍃 Bir rüzgar var. Onu hissedebilirsin.</p>
+        <p class="aw-light-line" id="awl-3">🤝 Yanında bir insan var. Onu gör.</p>
+        <p class="aw-light-line" id="awl-4">Ekranın sana veremediği tek şey: <strong>gerçek temas.</strong></p>
+        <p class="aw-light-cta" id="awl-5">▶️ &nbsp;Gerçeğe adım at</p>
       </div>
     </div>
 
@@ -99,11 +113,23 @@
        FLOWER BLOOM LAYER (appears as XP grows)
   ══════════════════════════════════════════════════════ -->
   <div id="flower-layer" aria-hidden="true">
-    <div class="flower" id="fl-1" style="left:8%;top:20%"></div>
-    <div class="flower" id="fl-2" style="left:88%;top:35%"></div>
-    <div class="flower" id="fl-3" style="left:15%;top:75%"></div>
-    <div class="flower" id="fl-4" style="left:75%;top:80%"></div>
-    <div class="flower" id="fl-5" style="left:48%;top:12%"></div>
+    <div class="flower draggable-flower" id="fl-1" style="left:8%;top:20%"></div>
+    <div class="flower draggable-flower" id="fl-2" style="left:88%;top:35%"></div>
+    <div class="flower draggable-flower" id="fl-3" style="left:15%;top:75%"></div>
+    <div class="flower draggable-flower" id="fl-4" style="left:75%;top:80%"></div>
+    <div class="flower draggable-flower" id="fl-5" style="left:48%;top:12%"></div>
+  </div>
+
+  <!-- BIRD SOUND DETECTION OVERLAY -->
+  <div id="bird-overlay" aria-live="assertive">
+    <div id="bird-bloom"></div>
+    <div id="bird-msg">
+      <div id="bird-icon">🐦</div>
+      <h2>SİSTEM SENİ KAYBETTİ.</h2>
+      <h2 class="bird-green">DOĞA SENİ BULDU. ✓</h2>
+      <p>1000Hz – 4000Hz aralığında doğal frekans tespit edildi.<br/>Algoritma bu anı ölçemez.<br/><span class="bird-xp">+30 XP</span> insanılık puanı kazandın.</p>
+      <div class="bird-cta">[ devam etmek için dokun ]</div>
+    </div>
   </div>
 
   <!-- ══════════════════════════════════════════════════════
@@ -202,6 +228,7 @@
           <div class="dash-stat-row"><span class="dash-stat-key">KURTARILAN SÜRE</span><span class="dash-stat-val" id="dash-rescued">0sn</span></div>
           <div class="dash-stat-row"><span class="dash-stat-key">GATUR ETKİSİ</span><span class="dash-stat-val" id="dash-gatur-effect">AKTİF</span></div>
           <div class="dash-stat-row"><span class="dash-stat-key">KAYDEDİLDİ</span><span class="dash-stat-val accent-green">EVET (local)</span></div>
+          <div class="dash-stat-row" title="Sadece tarayıcının localStorage'ında. Sunucuya gönderilmez."><span class="dash-stat-key">VERİ GİZLİLİĞİ</span><span class="dash-stat-val">⚠ Sadece yerel</span></div>
           <button id="dash-reset-btn" class="secondary-btn danger-btn dash-reset-btn">↺ XP SIFIRLA</button>
         </div>
 
@@ -419,6 +446,17 @@
           </div>
         </div>
 
+        <div class="manifesto-block manifesto-block--final">
+          <span class="manifesto-num" style="color:var(--green)">09</span>
+          <div class="manifesto-text">
+            <h3>Son Adım: Ekranı Gömmek</h3>
+            <p>Bu ekranı her kapattığında, bir algoritma aç kalır ve bir insan nefes alır. Project Oculi sana yolu gösterdi; ama yolu yüryen senin ayaklarındır.</p>
+            <p style="margin-top:16px">Yapay zeka sana çiçeklerin fotoğrafını sunar, biz ise seni o çiçeğin toprağına dokunmaya gönderiyoruz. Gerçeklik buraya yazılı değil. Gerçeklik, şu an bu yazıyı okurken ciğerlerine çektiğin o hava, masandaki suyun soğukluğu ve yanındaki dostunun sesindeki o eşsiz tınıdır.</p>
+            <p style="margin-top:16px"><em>Bizim görevimiz bitti. Senin görevin ise yeni başlıyor.</em></p>
+            <p class="manifesto-final-cta">Git ve bir ağaca dokun.<br/><strong>Yarın buraya gelme.</strong></p>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -426,13 +464,33 @@
     <footer id="site-footer">
       <div class="footer-inner">
         <span class="footer-tag">[ PROJECT OCULI ]</span>
-        <span class="footer-tag">// v1.0-phase3</span>
+        <span class="footer-tag">// v1.0-phase-final</span>
         <span class="footer-tag">// sosyal deney</span>
         <span class="footer-tag" id="footer-gatur-live">// küresel parazit: 87.4%</span>
+      </div>
+      <div class="footer-closing">
+        Bu ekranı her kapattığında, bir algoritma aç kalır ve bir insan nefes alır.
       </div>
     </footer>
 
   </main>
+
+  <!-- ══ FIXED BOTTOM NATURE BAR ══ -->
+  <div id="nature-bar">
+    <div class="nb-left">
+      <span class="nb-icon">🌿</span>
+      <span class="nb-label">DOĞA SESLERİ</span>
+    </div>
+    <div class="nb-sounds">
+      <button class="nb-btn" id="nb-bird"  onclick="toggleNatureSound('bird')">🐦 Kuş</button>
+      <button class="nb-btn" id="nb-wind"  onclick="toggleNatureSound('wind')">💨 Rüzgar</button>
+      <button class="nb-btn" id="nb-rain"  onclick="toggleNatureSound('rain')">🌧 Yağmur</button>
+      <button class="nb-btn nb-stop" id="nb-stop" onclick="stopNatureBar()">⏹ Sessiz</button>
+    </div>
+    <div class="nb-right">
+      <span class="nb-cta">Pencereyi aç. Gerçek sesi duy.</span>
+    </div>
+  </div>
 
   <script src="core.js"></script>
 </body>
