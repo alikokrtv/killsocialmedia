@@ -181,6 +181,79 @@ body.awakened #gatur-overlay { opacity: 0 !important; pointer-events: none; }
   100%{transform:translate(2%,-2%)}
 }
 
+/* ──────────────────────────────────────────────────
+   TRANCE SCENES — Visual Overhaul (Phase Final)
+────────────────────────────────────────────────── */
+.trance-scene {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 2s ease;
+  background: black;
+}
+
+/* METRO — Glowing Tunnel */
+#scene-metro {
+  background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #000 70%);
+}
+#scene-metro::before {
+  content: '🚇'; font-size: 80px; filter: grayscale(1) brightness(0.2) drop-shadow(0 0 10px var(--violet));
+  animation: metro-shake 0.1s infinite;
+}
+#scene-metro::after {
+  content: ''; position: absolute; width: 100%; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--violet), transparent);
+  top: 60%; animation: tunnel-lines 0.5s linear infinite;
+}
+@keyframes tunnel-lines { from { transform: scaleX(0); opacity: 0; } to { transform: scaleX(2); opacity: 0.5; } }
+@keyframes metro-shake { 0%,100% { transform: translate(0,0); } 50% { transform: translate(1px, 1px); } }
+
+/* STREET — Bokeh & Glitch */
+#scene-street {
+  background: radial-gradient(circle at center, #101010 0%, #000 80%);
+}
+#scene-street::before {
+  content: '🚶‍♀️'; font-size: 80px; opacity: 0.15; filter: blur(2px);
+}
+.street-bokeh {
+  position: absolute; width: 40px; height: 40px; border-radius: 50%;
+  background: var(--violet); opacity: 0.1; filter: blur(10px);
+  animation: bokeh-float 5s infinite ease-in-out;
+}
+@keyframes bokeh-float { 0%,100% { transform: translate(0,0); } 50% { transform: translate(20px, -20px); } }
+
+/* BED — Phone Glow */
+#scene-bed {
+  background: radial-gradient(circle at center, #0a0a1a 0%, #000 60%);
+}
+#scene-bed::before {
+  content: ''; width: 40px; height: 70px; border: 2px solid rgba(128,0,128,0.3);
+  border-radius: 4px; background: rgba(128,0,128,0.1);
+  box-shadow: 0 0 40px 10px rgba(128,0,128,0.4);
+  animation: pulse-glow 2s infinite alternate;
+}
+@keyframes pulse-glow { from { opacity: 0.4; box-shadow: 0 0 20px 5px rgba(128,0,128,0.2); } to { opacity: 1; box-shadow: 0 0 60px 20px rgba(128,0,128,0.6); } }
+
+/* TRANCE PUNISHMENT WARNING */
+#trance-warning {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 500; font-family: var(--mono); font-size: 24px; color: var(--red);
+  text-align: center; text-transform: uppercase; letter-spacing: 4px;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  text-shadow: 0 0 10px var(--red);
+}
+.glitch-active {
+  animation: glitch-vibrate 0.1s infinite;
+}
+@keyframes glitch-vibrate {
+  0% { transform: translate(-50%, -50%) translate(2px, 2px); }
+  50% { transform: translate(-50%, -50%) translate(-2px, -2px); }
+  100% { transform: translate(-50%, -50%) translate(1px, -1px); }
+}
+
 #aw-hint {
   position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
   font-size:10px;color:rgba(128,0,128,.5);letter-spacing:4px;
@@ -894,4 +967,112 @@ body.awakened .nb-btn { color:var(--warm-text); }
 @media(max-width:600px) {
   #nature-bar { flex-wrap:wrap;justify-content:center; }
   .nb-right { display:none; }
+}
+
+/* ══════════════════════════════════════════════════════
+   AWAKENING SLAP CARDS
+══════════════════════════════════════════════════════ */
+/* Override the old #aw-light-msg positioning for slap layout */
+#aw-light-msg {
+  position:absolute;
+  top:0;left:0;right:0;bottom:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:0;margin-top:0;padding:24px;
+  z-index:10;
+}
+
+.awl-slap {
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;
+  padding:28px 40px;
+  background:rgba(0,0,0,.8); /* Darker for contrast */
+  backdrop-filter:blur(8px); /* More blur */
+  border: 1px solid rgba(255,255,255,0.1);
+  border-left:4px solid rgba(255,80,0,.8);
+  max-width:700px;width:100%;
+  opacity:0;transform:translateX(-40px) scale(.96);
+  transition:opacity .4s ease,transform .4s cubic-bezier(.34,1.2,.64,1);
+  margin-bottom:12px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+.awl-slap.visible {
+  opacity:1;transform:translateX(0) scale(1);
+  animation:slap-flash .3s ease;
+}
+@keyframes slap-flash {
+  0%{background:rgba(255,80,0,.25)}
+  100%{background:rgba(0,0,0,.55)}
+}
+
+.awl-stat-num {
+  display:block;
+  font-family:var(--mono);
+  font-size:clamp(28px,8vw,72px);
+  font-weight:900;
+  color:#FF6600;
+  text-shadow:0 0 30px rgba(255,100,0,.5);
+  letter-spacing:-2px;
+  line-height:1;
+  margin-bottom:8px;
+}
+.awl-stat-label {
+  display:block;
+  font-family:var(--mono);
+  font-size:clamp(12px,2vw,16px);
+  color:rgba(255,255,255,.75);
+  letter-spacing:1px;
+  line-height:1.6;
+}
+
+/* Irony reveal */
+.awl-irony-reveal {
+  text-align:center;max-width:600px;
+  padding:24px 32px;
+  background:rgba(0,0,0,.85); /* Darker */
+  backdrop-filter:blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+  opacity:0;transform:translateY(20px);
+  transition:opacity .8s ease,transform .8s ease;
+  margin-bottom:12px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+.awl-irony-reveal.visible { opacity:1;transform:translateY(0); }
+.awl-irony-reveal p {
+  font-family:var(--handwriting);
+  font-size:clamp(18px,3vw,28px);
+  color:rgba(255,255,255,.7);
+  margin-bottom:6px;
+}
+.awl-irony-ans {
+  color:#FF6600 !important;
+  font-size:clamp(22px,4vw,36px) !important;
+  font-weight:700;
+}
+.awl-irony-real {
+  color:var(--green) !important;
+  font-size:clamp(20px,3.5vw,32px) !important;
+}
+.awl-irony-real strong { color:#fff; }
+
+/* CTA in slap mode */
+#aw-light-msg .aw-light-cta {
+  font-family:var(--mono);font-size:14px;letter-spacing:6px;
+  color:#000;background:var(--green);
+  padding:16px 48px;border:none;border-radius:2px;
+  opacity:0;cursor:default;
+  transition:opacity .8s ease,transform .2s,box-shadow .3s;
+  box-shadow:0 4px 24px rgba(0,255,65,.4);
+}
+#aw-light-msg .aw-light-cta.visible { opacity:1;cursor:pointer; }
+#aw-light-msg .aw-light-cta:hover { transform:scale(1.06);box-shadow:0 8px 48px rgba(0,255,65,.6); }
+
+/* ══════════════════════════════════════════════════════
+   NATURE BAR — IRONY TEXT
+══════════════════════════════════════════════════════ */
+.nb-irony {
+  font-family:var(--handwriting);font-size:12px;
+  color:rgba(74,124,63,.7);font-style:italic;
+  opacity:0;transition:opacity .6s ease;
+  margin-right:12px;
 }

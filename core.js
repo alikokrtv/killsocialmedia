@@ -89,6 +89,45 @@ let notifActive = false;
 let notifAC = null;   // shared AudioContext for notifications
 let notifInterval = 2500;
 
+// TRANCE INTERACTION PUNISHMENT (Phase Final)
+let tranceHeat = 0;
+let tranceHeatActive = false;
+let tranceWarningEl = null;
+
+function registerTrancePunishment() {
+  const t = document.getElementById('aw-trance');
+  tranceWarningEl = document.getElementById('trance-warning');
+  if (!t) return;
+  tranceHeatActive = true;
+  tranceHeat = 0;
+
+  const punish = (e) => {
+    if (!tranceHeatActive) return;
+    tranceHeat += 15; // big boost
+    if (tranceHeat > 100) tranceHeat = 100;
+  };
+
+  t.addEventListener('mousemove', () => { if(tranceHeatActive) tranceHeat += 0.8; });
+  t.addEventListener('mousedown', punish);
+  t.addEventListener('touchstart', punish);
+  window.addEventListener('keydown', punish);
+
+  // Decay loop
+  const decay = setInterval(() => {
+    if (!tranceHeatActive) { clearInterval(decay); return; }
+    if (tranceHeat > 0) tranceHeat -= 2;
+    if (tranceHeat < 0) tranceHeat = 0;
+
+    // Visuals
+    if (tranceWarningEl) {
+      tranceWarningEl.style.opacity = tranceHeat > 60 ? '1' : '0';
+      tranceWarningEl.style.transform = `translate(-50%, -50%) scale(${1 + (tranceHeat/200)})`;
+      if (tranceHeat > 80) tranceWarningEl.classList.add('glitch-active');
+      else tranceWarningEl.classList.remove('glitch-active');
+    }
+  }, 100);
+}
+
 function startFakeNotifications() {
   notifActive = true;
   notifInterval = 2500;
@@ -98,9 +137,11 @@ function startFakeNotifications() {
     const n = FAKE_NOTIFS[Math.floor(Math.random() * FAKE_NOTIFS.length)];
     showFakeNotif(n);
     playNotifSound(n.sound);
-    // Accelerate: every 8s reduce interval
+    // Standard acceleration
     notifInterval = Math.max(600, notifInterval - 80);
-    setTimeout(spawn, notifInterval + Math.random() * 400);
+    // TRANCE HEAT speedup: can go down to 150ms
+    const actualInterval = Math.max(150, notifInterval - (tranceHeat * 15));
+    setTimeout(spawn, actualInterval + Math.random() * 200);
   }
   setTimeout(spawn, 2000);
   // Cacophony build — rapid fire last 5 seconds
@@ -385,9 +426,12 @@ function runAwakeningSequence() {
   startWhispers();
   startSceneCycle();
   startFakeNotifications();
+  registerTrancePunishment();
 
   // ── PHASE B: DUR. (30s) ──
   setTimeout(() => {
+    tranceHeatActive = false; // Stop punishment
+    if (tranceWarningEl) tranceWarningEl.style.opacity = '0';
     trance.classList.add('hidden');
     durPhase.classList.remove('hidden');
     stopWhispers();
@@ -474,15 +518,41 @@ function playDurSound() {
   } catch(e) {}
 }
 
-/* ── Light messages appear sequentially ── */
+/* ── Light messages (slap sequence) ── */
 function showLightMessages() {
-  const lines = ['awl-1','awl-2','awl-3','awl-4','awl-5'];
-  lines.forEach((id, i) => {
+  // awl-1,2,3 are hard stat slaps — play impact sound
+  // awl-4 is irony reveal — no hit
+  // awl-5 is CTA
+  const seq = [
+    { id:'awl-1', delay:600,  sound:true },
+    { id:'awl-2', delay:2400, sound:true },
+    { id:'awl-3', delay:4200, sound:true },
+    { id:'awl-4', delay:6400, sound:false },
+    { id:'awl-5', delay:9000, sound:false },
+  ];
+  seq.forEach(({ id, delay, sound }) => {
     setTimeout(() => {
       const el = document.getElementById(id);
       if (el) el.classList.add('visible');
-    }, i * 2200 + 800);
+      if (sound) playLightImpact();
+    }, delay);
   });
+}
+
+function playLightImpact() {
+  try {
+    const ac  = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ac.createOscillator();
+    const g   = ac.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(120, ac.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(40, ac.currentTime + 0.25);
+    g.gain.setValueAtTime(0.35, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.3);
+    osc.connect(g); g.connect(ac.destination);
+    osc.start(); osc.stop(ac.currentTime + 0.32);
+    setTimeout(() => { try { ac.close(); } catch(e){} }, 400);
+  } catch(e) {}
 }
 
 /* ── Synth nature sounds (birds + wind) ── */
@@ -968,93 +1038,134 @@ function initDraggableFlowers() {
 }
 
 /* ──────────────────────────────────────────────────
-   NATURE BAR — Synth Sound System
-   Modes: bird | wind | rain | off
+   NATURE BAR — Multi-Mode Synth Sound System
+   Each mode gets its own AudioContext so they layer
 ────────────────────────────────────────────────── */
-let nbAC        = null;
-let nbGain      = null;
-let nbSources   = [];   // all active source nodes
-let nbMode      = null;
-let nbBirdTimer = null;
+const nbContexts   = {};   // mode → { ac, gain }
+const nbActiveModes = new Set();
+const nbBirdTimers  = {};
 
 function toggleNatureSound(mode) {
-  if (nbMode === mode) { stopNatureBar(); return; }
-  stopNatureBar(true); // stop silently
-  try {
-    nbAC   = new (window.AudioContext || window.webkitAudioContext)();
-    nbGain = nbAC.createGain();
-    nbGain.gain.setValueAtTime(0, nbAC.currentTime);
-    nbGain.gain.linearRampToValueAtTime(0.2, nbAC.currentTime + 2);
-    nbGain.connect(nbAC.destination);
-    nbMode = mode;
-
-    if (mode === 'wind') spawnNbWind();
-    if (mode === 'rain') spawnNbRain();
-    if (mode === 'bird') { spawnNbWind(0.04); scheduleNbBirds(); }
-
-    // UI
-    ['bird','wind','rain'].forEach(m => {
-      document.getElementById('nb-' + m)?.classList.toggle('nb-active', m === mode);
-    });
-  } catch(e) {}
-}
-
-function stopNatureBar(silent = false) {
-  if (nbBirdTimer) { clearTimeout(nbBirdTimer); nbBirdTimer = null; }
-  if (nbGain) {
-    nbGain.gain.linearRampToValueAtTime(0, nbAC.currentTime + (silent ? 0.05 : 1.5));
-    setTimeout(() => { if (nbAC) { nbAC.close(); nbAC = null; nbGain = null; nbSources = []; } }, 1600);
-  }
-  nbMode = null;
-  ['bird','wind','rain'].forEach(m => document.getElementById('nb-' + m)?.classList.remove('nb-active'));
-}
-
-function spawnNbWind(vol = 0.08) {
-  if (!nbAC) return;
-  const buf  = nbAC.createBuffer(1, nbAC.sampleRate * 6, nbAC.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-  const src  = nbAC.createBufferSource(); src.buffer = buf; src.loop = true;
-  const bp   = nbAC.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 500; bp.Q.value = 0.3;
-  const g    = nbAC.createGain(); g.gain.value = vol;
-  src.connect(bp); bp.connect(g); g.connect(nbGain);
-  src.start(); nbSources.push(src);
-}
-
-function spawnNbRain() {
-  if (!nbAC) return;
-  // White noise through lowpass
-  const buf  = nbAC.createBuffer(1, nbAC.sampleRate * 4, nbAC.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-  const src  = nbAC.createBufferSource(); src.buffer = buf; src.loop = true;
-  const lp   = nbAC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 4000;
-  const g    = nbAC.createGain(); g.gain.value = 0.12;
-  // Tremolo for rain variation
-  const lfo  = nbAC.createOscillator(); lfo.frequency.value = 8;
-  const lMod = nbAC.createGain(); lMod.gain.value = 0.03;
-  lfo.connect(lMod); lMod.connect(g.gain); lfo.start();
-  src.connect(lp); lp.connect(g); g.connect(nbGain);
-  src.start(); nbSources.push(src);
-}
-
-function scheduleNbBirds() {
-  if (!nbAC || nbMode !== 'bird') return;
-  const freq = 1800 + Math.random() * 2400;
-  const osc  = nbAC.createOscillator();
-  const env  = nbAC.createGain(); env.gain.value = 0;
-  osc.type = 'sine';
-  osc.frequency.setValueAtTime(freq, nbAC.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(freq * 1.35, nbAC.currentTime + 0.09);
-  osc.frequency.exponentialRampToValueAtTime(freq * 0.88, nbAC.currentTime + 0.2);
-  env.gain.linearRampToValueAtTime(0.06, nbAC.currentTime + 0.02);
-  env.gain.exponentialRampToValueAtTime(0.001, nbAC.currentTime + 0.22);
-  osc.connect(env); env.connect(nbGain);
-  osc.start(); osc.stop(nbAC.currentTime + 0.25);
-  if (Math.random() > 0.4) {
-    nbBirdTimer = setTimeout(scheduleNbBirds, 180 + Math.random() * 100);
+  if (nbActiveModes.has(mode)) {
+    // Turn OFF this mode
+    _nbStopMode(mode);
+    document.getElementById('nb-' + mode)?.classList.remove('nb-active');
   } else {
-    nbBirdTimer = setTimeout(scheduleNbBirds, 800 + Math.random() * 2500);
+    // Turn ON this mode
+    _nbStartMode(mode);
+    document.getElementById('nb-' + mode)?.classList.add('nb-active');
   }
+  // Update irony visibility
+  const hasAny = nbActiveModes.size > 0;
+  const irony  = document.getElementById('nb-irony');
+  if (irony) irony.style.opacity = hasAny ? '1' : '0';
 }
+
+function _nbStartMode(mode) {
+  try {
+    const ac   = new (window.AudioContext || window.webkitAudioContext)();
+    const gain = ac.createGain();
+    gain.gain.setValueAtTime(0, ac.currentTime);
+    gain.gain.linearRampToValueAtTime(0.2, ac.currentTime + 2);
+    gain.connect(ac.destination);
+    nbContexts[mode] = { ac, gain };
+    nbActiveModes.add(mode);
+
+    if (mode === 'wind') _nbWind(ac, gain, 0.1);
+    if (mode === 'rain') _nbRain(ac, gain);
+    if (mode === 'bird') { _nbWind(ac, gain, 0.04); _nbBirdLoop(mode, ac, gain); }
+  } catch(e) { console.warn('[nb] start failed', mode, e); }
+}
+
+function _nbStopMode(mode) {
+  if (nbBirdTimers[mode]) { clearTimeout(nbBirdTimers[mode]); delete nbBirdTimers[mode]; }
+  nbActiveModes.delete(mode);
+  const ctx = nbContexts[mode];
+  if (!ctx) return;
+  try {
+    ctx.gain.gain.cancelScheduledValues(ctx.ac.currentTime);
+    ctx.gain.gain.linearRampToValueAtTime(0, ctx.ac.currentTime + 0.8);
+    const acToClose = ctx.ac;
+    setTimeout(() => {
+      try { if(acToClose.state !== 'closed') acToClose.close(); } catch(e){}
+    }, 1000);
+  } catch(e) {}
+  delete nbContexts[mode];
+}
+
+function stopNatureBar() {
+  ['bird','wind','rain'].forEach(m => {
+    _nbStopMode(m);
+    document.getElementById('nb-' + m)?.classList.remove('nb-active');
+  });
+  const irony = document.getElementById('nb-irony');
+  if (irony) irony.style.opacity = '0';
+}
+
+function _nbWind(ac, gain, vol = 0.1) {
+  const buf  = ac.createBuffer(1, ac.sampleRate * 8, ac.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  const src  = ac.createBufferSource(); src.buffer = buf; src.loop = true;
+
+  // Double filter for "airy" quality
+  const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1200;
+  const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 450; bp.Q.value = 0.5;
+
+  // Slow volume tremolo (gusts)
+  const lfo  = ac.createOscillator(); lfo.frequency.value = 0.12;
+  const lmod = ac.createGain(); lmod.gain.value = vol * 0.5;
+  lfo.connect(lmod); lmod.connect(gain.gain); lfo.start();
+
+  const g = ac.createGain(); g.gain.value = vol;
+  src.connect(lp); lp.connect(bp); bp.connect(g); g.connect(gain);
+  src.start();
+}
+
+function _nbRain(ac, gain) {
+  const buf  = ac.createBuffer(2, ac.sampleRate * 5, ac.sampleRate);
+  [0,1].forEach(ch => {
+    const d = buf.getChannelData(ch);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  });
+  const src = ac.createBufferSource(); src.buffer = buf; src.loop = true;
+  const lp  = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 5000; lp.Q.value = 0.5;
+  const hp  = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 300;
+  const g   = ac.createGain(); g.gain.value = 0.13;
+  // Tremolo for rainfall rhythm
+  const lfo  = ac.createOscillator(); lfo.frequency.value = 12;
+  const lmod = ac.createGain(); lmod.gain.value = 0.025;
+  lfo.connect(lmod); lmod.connect(g.gain); lfo.start();
+  src.connect(hp); hp.connect(lp); lp.connect(g); g.connect(gain);
+  src.start();
+}
+
+function _nbBirdLoop(mode, ac, gain) {
+  if (!nbActiveModes.has(mode)) return;
+  const tStart = ac.currentTime + 0.1;
+  const baseFreq = 2200 + Math.random() * 1800;
+  const count = 2 + Math.floor(Math.random() * 2);
+
+  for(let i=0; i<count; i++) {
+    const t0 = tStart + i * 0.15;
+    const osc = ac.createOscillator();
+    const env = ac.createGain();
+    osc.type = 'sine';
+    const f = baseFreq + (i*150);
+    osc.frequency.setValueAtTime(f, t0);
+    osc.frequency.exponentialRampToValueAtTime(f * 1.5, t0 + 0.05);
+    osc.frequency.exponentialRampToValueAtTime(f * 0.8, t0 + 0.12);
+
+    env.gain.setValueAtTime(0, t0);
+    env.gain.linearRampToValueAtTime(0.08, t0 + 0.02);
+    env.gain.exponentialRampToValueAtTime(0.001, t0 + 0.13);
+
+    osc.connect(env); env.connect(gain);
+    osc.start(t0); osc.stop(t0 + 0.15);
+  }
+
+  const delay = 1000 + Math.random() * 3000;
+  nbBirdTimers[mode] = setTimeout(() => _nbBirdLoop(mode, ac, gain), delay);
+}
+
 
